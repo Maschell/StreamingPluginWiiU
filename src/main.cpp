@@ -5,8 +5,8 @@
 #include "MJPEGStreamServer.hpp"
 
 // Mandatory plugin information.
-WUPS_PLUGIN_NAME("Gamepad streaming tool. Open http://<ip of your wii u>:8000 on a browser in the same network.");
-WUPS_PLUGIN_DESCRIPTION("");
+WUPS_PLUGIN_NAME("Gamepad streaming tool.");
+WUPS_PLUGIN_DESCRIPTION("Streams the screen via HTTP to a browser. Open http://<ip of your wii u>:8000 on a browser in the same network.");
 WUPS_PLUGIN_VERSION("v0.1");
 WUPS_PLUGIN_AUTHOR("Maschell");
 WUPS_PLUGIN_LICENSE("GPL");
