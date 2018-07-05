@@ -6,9 +6,9 @@ This is just a simple plugin that allows you to stream the content of the DRC to
 Currently no configuration without recompiling is supported. It streams in a resolution of 428x240 and tries to achieve 20 fps. These numbers might improve in the future.
 
 But general notes:
-- This is still an early PoC
-- Encoding is done in software, note hardware
-- It probably affects gameplay. Loading times are increased, games could lag. I wouldn't recommend you to play Online.
+- This is still an early PoC.
+- Encoding is done in software, not hardware.
+- It probably affects gameplay. Loading times are increased, games could lag. I wouldn't recommend you to play online.
 - All settings are hardcoded. In the future it will (hopefully) be possible to choose the screen to stream (TV or DRC), at which resolution and which quality.
 - No streaming of the home menu.
 - Probably unstable.
@@ -16,7 +16,7 @@ But general notes:
 - Currently streaming is achieved via "MJPEG via HTTP", this might change in the future to improve performance.
 
 # Usage
-Simply load the plugin with the plugin loader. When the system menu is loaded, you can open `http://<ip of your ip>:8080` on your browser an should see the stream. Whenever you switch the application (e.g. load a game), you need to refresh the site in your browser.  
+Simply load the plugin with the plugin loader. When the system menu is loaded, you can open `http://<ip of your ip>:8080` on your browser and should see the stream. Whenever you switch the application (e.g. load a game), you need to refresh the site in your browser.  
 Example when the IP of your Wii U is 192.168.0.44.
 ```
 http:/192.168.0.44:8080
@@ -38,7 +38,7 @@ For building you need:
 - [dynamic_libs](https://github.com/Maschell/dynamic_libs/tree/lib) for access to the functions.
 - [libutils](https://github.com/Maschell/libutils) for common functions.
 
-Install them (in this order) according to their README's. Don't forget the dependencies of the libs itself.
+Install them (in this order) according to their READMEs. Don't forget the dependencies of the libs itself.
 
 Other external libraries are already located in the `libs` folder.
 
