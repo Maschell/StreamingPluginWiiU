@@ -31,7 +31,7 @@ OSMessage encodeQueueMessages[ENCODE_QUEUE_MESSAGE_COUNT] __attribute__((section
 
 void EncodingHelper::StartAsyncThread() {
     int32_t priority = 31;
-    this->pThread = CThread::create(DoAsyncThread, this, CThread::eAttributeAffCore0, priority,0x40000);
+    this->pThread = CThread::create(DoAsyncThread, this, CThread::eAttributeAffCore0 |CThread::eAttributeAffCore2 , priority,0x40000);
     this->pThread->resumeThread();
 }
 
