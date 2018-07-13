@@ -60,6 +60,7 @@ void MJPEGStreamServer::sendJPEG(uint8_t * buffer, uint64_t size) {
     char str[90];
     snprintf(str, 90, "\r\n--boundary\r\nContent-Type: image/jpeg\r\nContent-Length:  %llu \r\n\r\n", size);
 
+
     mysendwait(clientfd, str, strlen(str));
     mysendwait(clientfd, buffer, size);
 
@@ -88,9 +89,6 @@ BOOL MJPEGStreamServer::whileLoop() {
                 break;
             }
             OSSleepTicks(OSMicrosecondsToTicks(500));
-        }
-        if((uint32_t) message.message == 0x1234) {
-            continue;
         }
 
         if((uint32_t) message.message == 0xDEADBEEF) {
