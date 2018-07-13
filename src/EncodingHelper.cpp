@@ -84,7 +84,7 @@ JpegInformation * convertToJpeg(uint8_t * sourceBuffer, uint32_t width, uint32_t
 
     return NULL;
 }
-
+extern int32_t curQuality;
 void EncodingHelper::DoAsyncThreadInternal(CThread *thread) {
     serverRunning = true;
 
@@ -99,7 +99,7 @@ void EncodingHelper::DoAsyncThreadInternal(CThread *thread) {
                 DEBUG_FUNCTION_LINE("We should stop\n");
                 break;
             }
-            OSSleepTicks(OSMicrosecondsToTicks(5000));
+            OSSleepTicks(OSMicrosecondsToTicks(500));
             continue;
         }
         DCFlushRange(&message,sizeof(OSMessage));
@@ -112,7 +112,7 @@ void EncodingHelper::DoAsyncThreadInternal(CThread *thread) {
 
         colorBuffer = (GX2ColorBuffer *) message.args[1];
 
-        JpegInformation * info = convertToJpeg((uint8_t*) colorBuffer->surface.image,colorBuffer->surface.width,colorBuffer->surface.height,colorBuffer->surface.pitch,colorBuffer->surface.format,85);
+        JpegInformation * info = convertToJpeg((uint8_t*) colorBuffer->surface.image,colorBuffer->surface.width,colorBuffer->surface.height,colorBuffer->surface.pitch,colorBuffer->surface.format, curQuality);
 
         if(info != NULL ) {
             MJPEGStreamServer::getInstance()->streamJPEG(info);

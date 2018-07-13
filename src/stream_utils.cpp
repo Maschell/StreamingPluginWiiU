@@ -91,6 +91,13 @@ bool copyBuffer(GX2ColorBuffer * sourceBuffer, GX2ColorBuffer * targetBuffer, ui
 
 uint32_t frame_counter = 0;
 uint32_t frame_counter_skipped = 0;
+int32_t curQuality = 50;
+int32_t minQuality = 40;
+int32_t maxQuality = 85;
+int32_t stepQuality = 1;
+int32_t maxFrameDropsQuality = 20;
+int32_t minFrameDropsQuality = 95;
+
 
 bool streamVideo(GX2ColorBuffer *srcBuffer) {
     if(srcBuffer == NULL) {
@@ -163,8 +170,34 @@ bool streamVideo(GX2ColorBuffer *srcBuffer) {
         result = false;
     }
 
-    if(frame_counter % 120 == 0) {
-        DEBUG_FUNCTION_LINE("Send %d frames, skipped %d. %.2f\n",frame_counter-frame_counter_skipped,frame_counter_skipped,100.f * (frame_counter_skipped*1.0f/frame_counter));
+    if(frame_counter % 60 == 0) { // Print this every second.
+
+        int32_t curRatio = (int32_t)100.f*(frame_counter_skipped*1.0f/frame_counter);
+        int32_t curQualityOld = curQuality;
+        if(curRatio > maxFrameDropsQuality) {  // Lower the quality if we drop more than [maxFrameDropsQuality]% of the frames.
+            curQuality -= (curRatio - maxFrameDropsQuality);
+        } else if(curRatio < minFrameDropsQuality) { // Increase the quality if we drop less than [minFrameDropsQuality]% of the frames.
+            curQuality += stepQuality; // Increase the quality by [stepQuality]%
+        }
+
+        // Make sure to set the quality to at least [minQuality]%
+        if(curQuality < minQuality) {
+            curQuality = minQuality;
+        }
+
+        // Make sure to set the quality to at most [maxQuality]%
+        if(curQuality >= maxQuality) {
+            curQuality = maxQuality;
+        }
+
+        DEBUG_FUNCTION_LINE("Streaming at %d fps\n",frame_counter-frame_counter_skipped);
+
+        frame_counter = 0;
+        frame_counter_skipped = 0;
+
+        if(curQualityOld != curQuality) {
+            DEBUG_FUNCTION_LINE("Quality is now at %d%%\n",curQuality);
+        }
     }
 
     return result;

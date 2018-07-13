@@ -28,6 +28,7 @@
 extern OSMessageQueue streamSendQueue;
 extern OSMessage streamSendQueueMessages[STREAM_SEND_QUEUE_MESSAGE_COUNT];
 
+extern uint32_t frame_counter_skipped;
 
 class MJPEGStreamServer: TCPServer {
 
@@ -79,8 +80,9 @@ public:
             OSMessage message;
             message.message = (void *) 0x11111;
             message.args[0] = (uint32_t) info;
-            if(!OSSendMessage(&streamSendQueue,&message,OS_MESSAGE_FLAGS_BLOCKING)) {
-                DEBUG_FUNCTION_LINE("Dropping frame\n");
+            if(!OSSendMessage(&streamSendQueue,&message,OS_MESSAGE_FLAGS_NONE)) {
+                frame_counter_skipped++;
+                //DEBUG_FUNCTION_LINE("Dropping frame\n");
                 delete info;
                 return false;
             };
