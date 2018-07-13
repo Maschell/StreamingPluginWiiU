@@ -60,7 +60,7 @@ public:
 
 
     static int32_t getPriority() {
-        return 10;
+        return 31;
     }
 
     static volatile bool isInstanceConnected() {
