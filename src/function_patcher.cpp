@@ -10,8 +10,8 @@ uint32_t count = 0;
 
 DECL_FUNCTION(void, GX2CopyColorBufferToScanBuffer, const GX2ColorBuffer *colorBuffer, int32_t scan_target) {
     if(gAppStatus == WUPS_APP_STATUS_FOREGROUND) {
-        // Stream every 4th frame of the Gamepad (targetting 20fps)
-        if(scan_target == 4  &&  (count++ % 4 == 0)  && colorBuffer != NULL ) {
+
+        if(scan_target == 4  /*&&  (count++ % 4 == 0)*/  && colorBuffer != NULL ) {
             count = 0;
             streamVideo((GX2ColorBuffer *)colorBuffer);
         }
