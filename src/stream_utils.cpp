@@ -1,4 +1,5 @@
 #include "stream_utils.h"
+#include "retain_vars.hpp"
 #include "EncodingHelper.h"
 #include "MJPEGStreamServer.hpp"
 #include <fs/FSUtils.h>
@@ -31,6 +32,7 @@ bool copyBuffer(GX2ColorBuffer * sourceBuffer, GX2ColorBuffer * targetBuffer, ui
         targetBuffer->surface.depth =       1;
         targetBuffer->surface.mipLevels =   1;
         targetBuffer->surface.format =      GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8;
+        //targetBuffer->surface.format =      GX2_SURFACE_FORMAT_SRGB_R8_G8_B8_A8;
         targetBuffer->surface.aa =          GX2_AA_MODE1X;
         targetBuffer->surface.tileMode =    GX2_TILE_MODE_LINEAR_ALIGNED;
         targetBuffer->viewMip =             0;
@@ -117,12 +119,19 @@ bool streamVideo(GX2ColorBuffer *srcBuffer) {
     memset(colorBuffer,0,sizeof(GX2ColorBuffer));
 
     // keep dimensions
-    //uint32_t width = srcBuffer->surface.width;
-    //uint32_t height = srcBuffer->surface.height;
-    //uint32_t width = 640;
-    //uint32_t height = 360;
-    uint32_t width = 428;
-    uint32_t height = 240;
+
+    uint32_t width = 640/2;
+    uint32_t height = 360/2;
+
+    if(gResolution == WUPS_STREAMING_RESOLUTION_480P) {
+        width = 854;
+        height = 480;
+    } else  if(gResolution == WUPS_STREAMING_RESOLUTION_360P) {
+        width = 640;
+        height = 360;
+    } else {
+
+    }
 
     bool valid = copyBuffer(srcBuffer,colorBuffer,width,height);
     if(!valid) {

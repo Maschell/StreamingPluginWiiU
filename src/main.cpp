@@ -1,4 +1,9 @@
+#include <map>
+#include <string>
 #include <wups.h>
+#include <wups/confighooks.h>
+#include <wups/config/WUPSConfig.h>
+#include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <utils/logger.h>
 #include "retain_vars.hpp"
 #include "EncodingHelper.h"
@@ -13,6 +18,34 @@ WUPS_PLUGIN_LICENSE("GPL");
 
 // Something is using "write"...
 WUPS_FS_ACCESS()
+
+void resolutionChanged(int32_t newResolution) {
+    DEBUG_FUNCTION_LINE("Resolution changed %d \n",newResolution);
+    gResolution = newResolution;
+
+    // Restart server.
+    EncodingHelper::destroyInstance();
+    MJPEGStreamServer::destroyInstance();
+
+    EncodingHelper::getInstance()->StartAsyncThread();
+    MJPEGStreamServer::getInstance();
+}
+
+
+WUPS_GET_CONFIG() {
+    WUPSConfig* config = new WUPSConfig("Streaming Plugin");
+    WUPSConfigCategory* catOther = config->addCategory("Main");
+
+    std::map<int32_t,std::string> resolutionValues;
+    resolutionValues[WUPS_STREAMING_RESOLUTION_240P] = "240p";
+    resolutionValues[WUPS_STREAMING_RESOLUTION_360P] = "360p";
+    resolutionValues[WUPS_STREAMING_RESOLUTION_480P] = "480p";
+
+    //                    item Type             config id           displayed name              default value  onChangeCallback.
+    catOther->addItem(new WUPSConfigItemMultipleValues("resolution", "Streaming resolution", gResolution, resolutionValues, resolutionChanged));
+
+    return config;
+}
 
 // Gets called once the loader exists.
 INITIALIZE_PLUGIN() {
