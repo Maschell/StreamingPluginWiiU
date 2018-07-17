@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 #include <wups.h>
-#include <wups/confighooks.h>
+#include <wups/config.h>
 #include <wups/config/WUPSConfig.h>
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <utils/logger.h>
