@@ -17,12 +17,14 @@
 
 #include <vector>
 #include "EncodingHelper.h"
-#include "MJPEGStreamServer.hpp"
+#include "MJPEGStreamServerUDP.hpp"
 #include "stream_utils.h"
 #include "JpegInformation.h"
 #include <gx2/event.h>
 #include <gx2/surface.h>
 #include <gx2/mem.h>
+
+#include "retain_vars.hpp"
 
 EncodingHelper *EncodingHelper::instance = NULL;
 
@@ -30,7 +32,7 @@ OSMessageQueue encodeQueue __attribute__((section(".data")));
 OSMessage encodeQueueMessages[ENCODE_QUEUE_MESSAGE_COUNT] __attribute__((section(".data")));
 
 void EncodingHelper::StartAsyncThread() {
-    int32_t priority = 31;
+    int32_t priority = gEncodePriority;
     this->pThread = CThread::create(DoAsyncThread, this, CThread::eAttributeAffCore0 |CThread::eAttributeAffCore2 , priority,0x40000);
     this->pThread->resumeThread();
 }
@@ -115,7 +117,9 @@ void EncodingHelper::DoAsyncThreadInternal(CThread *thread) {
         JpegInformation * info = convertToJpeg((uint8_t*) colorBuffer->surface.image,colorBuffer->surface.width,colorBuffer->surface.height,colorBuffer->surface.pitch,colorBuffer->surface.format, curQuality);
 
         if(info != NULL ) {
-            MJPEGStreamServer::getInstance()->streamJPEG(info);
+            if(mjpegServer == NULL || !mjpegServer->streamJPEG(info)){
+                delete info;
+            }
         }
 
         //DEBUG_FUNCTION_LINE("We can now kill the colorBuffer\n",colorBuffer);

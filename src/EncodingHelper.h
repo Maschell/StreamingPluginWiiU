@@ -22,10 +22,10 @@
 #include <algorithm>
 
 #include <system/CThread.h>
+#include <coreinit/cache.h>
 #include <coreinit/messagequeue.h>
 #include <utils/logger.h>
-#include <MJPEGStreamServer.hpp>
-
+#include "MJPEGStreamServerUDP.hpp"
 
 #define ENCODE_QUEUE_MESSAGE_COUNT 1
 
@@ -53,7 +53,6 @@ public:
             delete instance;
             instance = NULL;
         }
-        MJPEGStreamServer::destroyInstance();
     }
 
     static bool addFSQueueMSG(OSMessage message) {
@@ -72,6 +71,16 @@ public:
         DCFlushRange((void*) &shouldExit,sizeof(shouldExit));
     }
 
+    void setMJPEGStreamServer(MJPEGStreamServer * server){
+        this->mjpegServer = server;
+    }
+
+    void setThreadPriority(int32_t priority){
+        if(pThread != NULL){
+            pThread->setThreadPriority(priority);
+        }
+    }
+
 private:
     EncodingHelper() {
         OSInitMessageQueue(&encodeQueue, encodeQueueMessages, ENCODE_QUEUE_MESSAGE_COUNT);
@@ -84,6 +93,8 @@ private:
     void DoAsyncThreadInternal(CThread *thread);
 
     CThread *pThread;
+
+    MJPEGStreamServer * mjpegServer = NULL;
 
     volatile bool serverRunning = false;
 

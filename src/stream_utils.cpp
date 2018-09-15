@@ -1,7 +1,7 @@
 #include "stream_utils.h"
 #include "retain_vars.hpp"
 #include "EncodingHelper.h"
-#include "MJPEGStreamServer.hpp"
+#include "HeartBeatServer.hpp"
 #include <fs/FSUtils.h>
 #include <malloc.h>
 
@@ -106,7 +106,7 @@ bool streamVideo(GX2ColorBuffer *srcBuffer) {
         return false;
     }
 
-    if(!MJPEGStreamServer::isInstanceConnected()) {
+    if(!HeartBeatServer::isInstanceConnected()) {
         return false;
     }
 

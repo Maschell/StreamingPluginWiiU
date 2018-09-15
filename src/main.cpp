@@ -7,7 +7,8 @@
 #include <utils/logger.h>
 #include "retain_vars.hpp"
 #include "EncodingHelper.h"
-#include "MJPEGStreamServer.hpp"
+#include "MJPEGStreamServerUDP.hpp"
+#include "HeartBeatServer.hpp"
 
 // Mandatory plugin information.
 WUPS_PLUGIN_NAME("Gamepad streaming tool.");
@@ -19,18 +20,25 @@ WUPS_PLUGIN_LICENSE("GPL");
 // Something is using "write"...
 WUPS_FS_ACCESS()
 
-void resolutionChanged(int32_t newResolution) {
+void resolutionChanged(WUPSConfigItemMultipleValues* configItem, int32_t newResolution) {
     DEBUG_FUNCTION_LINE("Resolution changed %d \n",newResolution);
     gResolution = newResolution;
 
     // Restart server.
     EncodingHelper::destroyInstance();
-    MJPEGStreamServer::destroyInstance();
-
     EncodingHelper::getInstance()->StartAsyncThread();
-    MJPEGStreamServer::getInstance();
+    EncodingHelper::getInstance()->setMJPEGStreamServer(HeartBeatServer::getInstance()->getMJPEGServer());
 }
 
+void screenChanged(WUPSConfigItemMultipleValues* configItem, int32_t newScreen) {
+    DEBUG_FUNCTION_LINE("Screen changed %d \n",newScreen);
+    gScreen = newScreen;
+
+    // Restart server.
+    EncodingHelper::destroyInstance();
+    EncodingHelper::getInstance()->StartAsyncThread();
+    EncodingHelper::getInstance()->setMJPEGStreamServer(HeartBeatServer::getInstance()->getMJPEGServer());
+}
 
 WUPS_GET_CONFIG() {
     WUPSConfig* config = new WUPSConfig("Streaming Plugin");
@@ -41,7 +49,12 @@ WUPS_GET_CONFIG() {
     resolutionValues[WUPS_STREAMING_RESOLUTION_360P] = "360p";
     resolutionValues[WUPS_STREAMING_RESOLUTION_480P] = "480p";
 
+    std::map<int32_t,std::string> screenValues;
+    screenValues[WUPS_STREAMING_SCREEN_DRC] = "Gamepad";
+    screenValues[WUPS_STREAMING_SCREEN_TV] = "TV";
+
     //                    item Type             config id           displayed name              default value  onChangeCallback.
+    catOther->addItem(new WUPSConfigItemMultipleValues("screen", "Screen", gScreen, screenValues, screenChanged));
     catOther->addItem(new WUPSConfigItemMultipleValues("resolution", "Streaming resolution", gResolution, resolutionValues, resolutionChanged));
 
     return config;
@@ -61,16 +74,18 @@ ON_APPLICATION_START(my_args) {
 
     gAppStatus = WUPS_APP_STATUS_FOREGROUND;
 
+    EncodingHelper::destroyInstance();
     EncodingHelper::getInstance()->StartAsyncThread();
-    MJPEGStreamServer::getInstance();
+    EncodingHelper::getInstance()->setMJPEGStreamServer(HeartBeatServer::getInstance()->getMJPEGServer());
 
     log_init();
 }
 
 ON_APP_STATUS_CHANGED(status) {
     gAppStatus = status;
+
     if(status == WUPS_APP_STATUS_CLOSED) {
         EncodingHelper::destroyInstance();
-        MJPEGStreamServer::destroyInstance();
+        HeartBeatServer::destroyInstance();
     }
 }
