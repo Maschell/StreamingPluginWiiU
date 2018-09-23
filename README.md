@@ -49,3 +49,17 @@ Other external libraries are already located in the `libs` folder.
 
 - libjpeg
 - [libturbojpeg](https://libjpeg-turbo.org/)
+
+### Building using the Dockerfile
+It's possible to use a docker image for building. This way you don't need anything installed on your host system.
+
+```
+# Build docker image (only needed once
+docker build . -t screenstreamer-builder
+
+# make 
+docker run -it --rm -v ${PWD}:/project screenstreamer-builder make
+
+# make clean
+docker run -it --rm -v ${PWD}:/project screenstreamer-builder make clean
+```
